@@ -5,11 +5,15 @@ import keyboard
 class item:
 
     #Class constructor.    
-    def __init__(self, name_id, price_id):
-        self.name = driver.find_element_by_id(name_id).text    #Name takes the same value. 
+    def __init__(self, name_id, price_id, owned_id):
+        #Name takes the same value.
+        self.name = driver.find_element_by_id(name_id).text     
         
         #Make the price id equal to the string for obtaining the price of the item.
         self.price_id = price_id
+
+        #Owned_id will be used to confidently know how many buildings where already buyed
+        self.owned_id = owned_id
 
         #Check for prefixes after the price and adjust accordingly.
         text = driver.find_element_by_id(self.price_id).text
@@ -20,17 +24,17 @@ class item:
                 self.price = int(text.replace(',',''))
         else:
             if(text.split(' ')[1] == 'million'):
-                self.price = int(float(text.split[0]) * 1000000)
+                self.price = int(float(text.split()[0]) * 1000000)
             if(text.split(' ')[1] == 'billion'):
-                self.price = int(float(text.split[0]) * 1000000000)
+                self.price = int(float(text.split()[0]) * 1000000000)
             if(text.split(' ')[1] == 'trillion'):
-                self.price = int(float(text.split[0]) * 1000000000000)
+                self.price = int(float(text.split()[0]) * 1000000000000)
             if(text.split(' ')[1] == 'quadrillion'):
-                self.price = int(float(text.split[0]) * 1000000000000000)
+                self.price = int(float(text.split()[0]) * 1000000000000000)
             if(text.split(' ')[1] == 'quintillion'):
-                self.price = int(float(text.split[0]) * 1000000000000000000)
+                self.price = int(float(text.split()[0]) * 1000000000000000000)
             if(text.split(' ')[1] == 'sextillion'):
-                self.price = int(float(text.split[0]) * 1000000000000000000000)   
+                self.price = int(float(text.split()[0]) * 1000000000000000000000)   
 
         #convert string into integer.
         self.owned = 0
@@ -58,13 +62,17 @@ class item:
             if(text.split(' ')[1] == 'sextillion'):
                 self.price = int(float(text.split()[0]) * 1000000000000000000000)                
 
+    #Function used to update the number of buildings owned.
+    def update_owned(self):
+        self.owned = int(driver.find_element_by_id(self.owned_id).text)
+    
     #Function used to buy an item, update price, number of items owned, and print the info about the item.
     def buy_action(self):
         upgrade_actions = ActionChains(driver)
         upgrade_actions.move_to_element(driver.find_element_by_id(self.price_id))
         upgrade_actions.click()
         upgrade_actions.perform()
-        self.owned += 1
+        self.update_owned()
         self.update_price()
         self.print_info()
 
@@ -119,7 +127,7 @@ for i in range(15):
 
 #Main program.
 while True:
-    if(keyboard.is_pressed("p")):
+    if(keyboard.is_pressed("3")):
         print("Finishing the program")
         break
     else:
@@ -127,7 +135,7 @@ while True:
         count = get_cookie_num(cookie_count.text)
         for i in range(18):
             if(count > initial_price[i] and not(flags[i])):
-                items.append(item(("productName" + str(i)),("productPrice" + str(i))))
+                items.append(item(("productName" + str(i)),("productPrice" + str(i)), ("productOwned" + str(i))))
                 print(f"{items[i].name} appended\n-------------")
                 flags[i] = True
                 item_cap += 2
